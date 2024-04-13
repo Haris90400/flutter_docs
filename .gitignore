@@ -47,3 +47,5 @@ android/app/google-services.json
 /server/.env
 
 web/index.html
+
+lib/constants.dart
