@@ -3,23 +3,20 @@ import 'package:flutter_docs/colors.dart';
 import 'package:flutter_docs/repository/auth_repository.dart';
 import 'package:flutter_docs/screens/home_screen.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:routemaster/routemaster.dart';
 
 class LoginScreen extends ConsumerWidget {
   const LoginScreen({super.key});
 
   void signInWithGoogle(WidgetRef ref, BuildContext context) async {
     final sMessanger = ScaffoldMessenger.of(context);
-    final navigator = Navigator.of(context);
+    final navigator = Routemaster.of(context);
     final errorModel = await ref
         .read(
           authrepositoryProvider,
         )
         .signInWithGoogle();
-    navigator.push(
-      MaterialPageRoute(
-        builder: (_) => const HomeScreen(),
-      ),
-    );
+    navigator.replace('/');
 
     if (errorModel.error == null) {
       ref.read(userProvider.notifier).update(
