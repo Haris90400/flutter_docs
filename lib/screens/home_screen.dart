@@ -52,7 +52,10 @@ class HomeScreen extends ConsumerWidget {
               ref,
               context,
             ),
-            icon: const Icon(Icons.add),
+            icon: const Icon(
+              Icons.add,
+              color: Colors.black,
+            ),
           ),
           IconButton(
             onPressed: () => signOut(ref),
