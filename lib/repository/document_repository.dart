@@ -107,4 +107,57 @@ class DocumentRepository {
     }
     return error;
   }
+
+  void updateTitle(
+      {required String token,
+      required String id,
+      required String title}) async {
+    await _client.post(
+      Uri.parse('$host/doc/title'),
+      headers: {
+        'Content-Type': 'application/json; charset=UTF-8',
+        'x-auth-token': token,
+      },
+      body: jsonEncode(
+        {
+          'id': id,
+          'title': title,
+        },
+      ),
+    );
+  }
+
+  Future<ErrorModel> getDocumentById(String token, String id) async {
+    ErrorModel error = ErrorModel(
+      error: 'Some unexpected error occurred.',
+      data: null,
+    );
+    try {
+      var res = await _client.get(
+        Uri.parse('$host/doc/$id'),
+        headers: {
+          'Content-Type': 'application/json; charset=UTF-8',
+          'x-auth-token': token,
+        },
+      );
+
+      switch (res.statusCode) {
+        case 200:
+          error = ErrorModel(
+            error: null,
+            data: DocumentModel.fromJson(res.body),
+          );
+
+          break;
+        default:
+          throw 'This document does not exist,please create a new one.';
+      }
+    } catch (e) {
+      error = ErrorModel(
+        error: e.toString(),
+        data: null,
+      );
+    }
+    return error;
+  }
 }
