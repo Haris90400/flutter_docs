@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_docs/colors.dart';
+import 'package:flutter_docs/common/widgets/loader.dart';
+import 'package:flutter_docs/models/document_model.dart';
+import 'package:flutter_docs/models/error_model.dart';
 import 'package:flutter_docs/repository/auth_repository.dart';
 import 'package:flutter_docs/repository/document_repository.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -32,6 +35,10 @@ class HomeScreen extends ConsumerWidget {
     }
   }
 
+  void navigateToDocument(BuildContext context, String docId) {
+    Routemaster.of(context).push('/document/$docId');
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final data = ref.watch(userProvider);
@@ -56,10 +63,47 @@ class HomeScreen extends ConsumerWidget {
           ),
         ],
       ),
-      body: Center(
-        child: Text(
-          data!.uid,
-        ),
+      body: FutureBuilder<ErrorModel?>(
+        future: ref.watch(documentRepositoryProvider).getMyDocuments(
+              ref.watch(userProvider)!.token,
+            ),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Loader();
+          }
+          return Center(
+            child: Container(
+              margin: const EdgeInsets.only(top: 10),
+              width: 600,
+              child: ListView.builder(
+                itemCount: snapshot.data!.data.length,
+                itemBuilder: (context, index) {
+                  DocumentModel document = snapshot.data!.data[index];
+
+                  return InkWell(
+                    onTap: () => navigateToDocument(
+                      context,
+                      document.id,
+                    ),
+                    child: SizedBox(
+                      height: 50,
+                      child: Card(
+                        child: Center(
+                          child: Text(
+                            document.title,
+                            style: const TextStyle(
+                              fontSize: 17,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+          );
+        },
       ),
     );
   }
